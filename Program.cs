@@ -1,54 +1,77 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.IO;//This class or library contains the File methods we need to read in the data from the CSV
 
-namespace ReadInFile
+namespace NotAnEscapeRoom
 {
-    internal class Program
+    class Program
     {
-        //Global variables
-        //Fileapth of the users.csv file which is stored in the BIN>DEDUB folder i.e. where the executable is run from
-        static string filePath = "users.csv";
-
-        //This is a 2D array
-        static string[,] users = new string[3, 8];
-
+        static string Path = "Users.csv";
+        static int NumOfDataPoints = 8;
+        static string[,] Users = new string[3, NumOfDataPoints];
+        
         static void Main(string[] args)
         {
-            readInFile();
-            for(int i=0;i<3;i++)
-            {
-                Console.WriteLine();
-                for(int j=0;j<8;j++)
-                {
-                    Console.Write(users[i,j]+",");  
-                }
-            }
-            Console.ReadKey();
-
+            SetUpFile();
+            
+            
         }
-
-        static void readInFile()
+        static void SetUpFile()
         {
-            string[] rawData = new string[3];
-            rawData = File.ReadAllLines(filePath);
-
-            string[] tempUser = new string[8];
-            for(int i=0;i<3;i++)
+            if(File.Exists(Path) == false)
             {
-                tempUser = rawData[i].Split(',');
-                for(int j=0;j<8;j++)
+                File.Create(Path);
+            }
+            ReadIn();
+        }
+        static void ReadIn()
+        {
+            string[] RawData = new string[3];
+            RawData = File.ReadAllLines(Path);
+            string[] TempUser;
+
+            for (int i = 0; i<RawData.Length; i++)
+            {
+                TempUser = RawData[i].Split(',');
+
+                for (int j = 0; j < NumOfDataPoints; j++)
                 {
-                    users[i,j] = tempUser[j];
+                    Users[i, j] = TempUser[j];    
                 }
             }
+            Console.WriteLine("File successfully loaded!");
 
-            Console.WriteLine("Data has been successfully read in. Press any key to continue");
+            /*for(int i = 0; i<3; i++)
+            {
+                for(int j=0; j<NumOfDataPoints; j++)
+                {
+                    Console.WriteLine(Users[i,j]);
+                }
+            }
+            *///This is a test to see if the File is loading everything in correctly
             Console.ReadKey();
-
+            MainMenu();
+        }
+        static void MainMenu()
+        {
+            
+            Banner("Main Menu");
+            int Option = 0;
+            Console.WriteLine("1. Log in");
+            Console.WriteLine("2. Sign up");
+            Console.WriteLine("\nSelect an option.");
+            
+            
+        }
+        static void Banner(string Location)
+        {
+            Console.Clear();
+            Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+            Console.WriteLine("NOT An Escape Room: " + Location);
+            Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
         }
     }
 }
