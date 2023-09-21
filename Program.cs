@@ -6,14 +6,17 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Linq.Expressions;
+using System.Data;
 
 namespace NotAnEscapeRoom
 {
     class Program
     {
         static string Path = "Users.csv";
-        static int NumOfDataPoints = 2; //Just username and password for now
-        static string[,] Users = new string[3, NumOfDataPoints];
+        static int NumOfDataPoints = 5;
+        static int NumOfUsers;
+        static string[,] UserData;
+
 
         static void Main(string[] args)
         {
@@ -25,13 +28,21 @@ namespace NotAnEscapeRoom
             if (File.Exists(Path) == false)
             {
                 File.Create(Path);
+                Console.WriteLine("File successfully created!");
+                Console.WriteLine("\nPress any key to continue.");
+                Console.ReadKey();
             }
             ReadIn();
         }
 
         static void ReadIn()
         {
-            string[] RawData = new string[3];
+            Console.Clear();
+            //Finding out how many users are in the program
+            NumOfUsers = File.ReadAllLines(Path).Length;
+            UserData = new string[NumOfUsers, NumOfDataPoints];
+
+            string[] RawData = new string[NumOfUsers];
             RawData = File.ReadAllLines(Path);
             string[] TempUser;
 
@@ -41,10 +52,12 @@ namespace NotAnEscapeRoom
 
                 for (int j = 0; j < NumOfDataPoints; j++)
                 {
-                    Users[i, j] = TempUser[j];
+                    UserData[i, j] = TempUser[j];
                 }
             }
             Console.WriteLine("File successfully loaded!");
+            Console.WriteLine("\nPress any key to continue.");
+
 
             /*for(int i = 0; i<3; i++)
             {
@@ -93,6 +106,7 @@ namespace NotAnEscapeRoom
 
                     default:
                         Console.WriteLine("Invalid option. Please enter: 1, 2, 3 or 0");
+                        Console.WriteLine("\nPress any key to continue.");
                         Console.ReadKey();
                         break;
                 }
@@ -109,11 +123,52 @@ namespace NotAnEscapeRoom
 
         static void AddUser()
         {
-            Console.Clear();
-            Banner("Add User");
-            Console.WriteLine("(Add User)");
+            string Username = "", Password = "";
+            do
+            {
+                Console.Clear();
+                Banner("Add User");
+
+                Console.WriteLine("Enter a username: ");
+                Username = Console.ReadLine();
+
+                Console.WriteLine("Enter a password: ");
+                Password = Console.ReadLine();
+            } while (Username == "" && Password == "");
+
+            string[] NewUser = new string[] { Username, Password, "0", "0", "0" }; //New user to write
+            NumOfUsers += 1;
+            string[,] NewUserData = new string[NumOfUsers, NumOfDataPoints]; //Creates the new array with one extra user
+
+            for (int i = 0; i < NumOfUsers-1; i++)//Adds all but new user to array
+            {
+                for (int j = 0; j < NumOfDataPoints; j++)
+                {
+                    NewUserData[i, j] = UserData[i, j];
+                }
+            }
+
+            for (int i = NumOfUsers-1; i < NumOfUsers; i++)//adds just the new user
+            {
+                for (int j = 0; j < NumOfDataPoints; j++)
+                {
+                    NewUserData[i, j] = NewUser[j];
+                }                
+            }
+            
+            /*for(int i = 0; i<NumOfUsers + 1; i++)
+            {
+                for(int j=0; j<NumOfDataPoints; j++)
+                {
+                    Console.WriteLine(NewUserData[i,j]);
+                }
+            }*/
+            //This is a test to see if the File is loading everything in correctly
+
+            Console.WriteLine("New user successfully created!");
+            Console.WriteLine("\nPress any key to write to file.");
             Console.ReadKey();
-            MainMenu();
+            SaveToFile(NewUserData);
         }
 
         static void Quiz()
@@ -132,6 +187,28 @@ namespace NotAnEscapeRoom
             Console.WriteLine("(Stats)");
             Console.ReadKey();
             MainMenu();
+        }
+
+        static void SaveToFile(string[,] UserData)
+        {
+            Console.Clear();
+            File.WriteAllText(Path, "");//Clears file
+            string TempUser;
+
+            for (int i = 0; i<NumOfUsers; i++)
+            {
+                for(int j = 0; j < NumOfDataPoints; j++)
+                {
+                    TempUser = UserData[i, j] + ",";
+                    File.AppendAllText(Path, TempUser);
+                }
+                File.AppendAllText(Path,"\n");
+            }
+
+            Console.WriteLine("File saved successfully!");
+            Console.WriteLine("\nPress any key to read-in file.");
+            Console.ReadKey();
+            ReadIn();            
         }
     }
 }
