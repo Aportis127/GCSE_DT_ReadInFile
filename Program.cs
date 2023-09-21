@@ -12,8 +12,10 @@ namespace NotAnEscapeRoom
     class Program
     {
         static string Path = "Users.csv";
-        static int NumOfDataPoints = 2; //Just username and password for now
-        static string[,] Users = new string[3, NumOfDataPoints];
+        static int NumOfDataPoints = 5;
+        static int NumOfUsers;
+        static string[,] UserData;
+
 
         static void Main(string[] args)
         {
@@ -31,6 +33,10 @@ namespace NotAnEscapeRoom
 
         static void ReadIn()
         {
+            //Finding out how many users are in the program
+            NumOfUsers = File.ReadAllLines(Path).Length;
+            UserData = new string[NumOfUsers, NumOfDataPoints];
+
             string[] RawData = new string[3];
             RawData = File.ReadAllLines(Path);
             string[] TempUser;
@@ -41,7 +47,7 @@ namespace NotAnEscapeRoom
 
                 for (int j = 0; j < NumOfDataPoints; j++)
                 {
-                    Users[i, j] = TempUser[j];
+                    UserData[i, j] = TempUser[j];
                 }
             }
             Console.WriteLine("File successfully loaded!");
@@ -109,9 +115,36 @@ namespace NotAnEscapeRoom
 
         static void AddUser()
         {
-            Console.Clear();
-            Banner("Add User");
-            Console.WriteLine("(Add User)");
+            string Username = "", Password = "";
+            do 
+            { 
+                Console.Clear();
+                Banner("Add User");
+                
+                Console.WriteLine("Enter a username: ");
+                Username = Console.ReadLine();
+
+                Console.WriteLine("Enter a password: ");
+                Password = Console.ReadLine();
+            } while(Username == "" && Password == "");
+
+            string[] NewUser = new string[] { Username, Password, "0", "0", "0" }; //New user to write
+            string[,] NewUserData = new string[NumOfUsers + 1, NumOfDataPoints]; //Creates the new array with one extra user
+
+            for(int i = 0; i<NumOfUsers; i++)
+            {
+                for(int j = 0; j<NumOfDataPoints; j++)
+                {
+                    UserData[i, j] = NewUserData[i, j];
+                    Console.WriteLine("yayayayayayay");
+                }
+            }
+
+            for(int i = NumOfUsers; i<NumOfUsers + 1; i++)//LOOK AT THIS LATER
+            {
+
+            }
+
             Console.ReadKey();
             MainMenu();
         }
