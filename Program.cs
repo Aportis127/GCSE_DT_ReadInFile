@@ -37,12 +37,16 @@ namespace NotAnEscapeRoom
 
         static void ReadIn()
         {
+
             Console.Clear();
+
             //Finding out how many users are in the program
             NumOfUsers = File.ReadAllLines(Path).Length;
             UserData = new string[NumOfUsers, NumOfDataPoints];
 
+
             string[] RawData = new string[NumOfUsers];
+
             RawData = File.ReadAllLines(Path);
             string[] TempUser;
 
@@ -124,16 +128,17 @@ namespace NotAnEscapeRoom
         static void AddUser()
         {
             string Username = "", Password = "";
-            do
-            {
+
                 Console.Clear();
                 Banner("Add User");
+
 
                 Console.WriteLine("Enter a username: ");
                 Username = Console.ReadLine();
 
                 Console.WriteLine("Enter a password: ");
                 Password = Console.ReadLine();
+
             } while (Username == "" && Password == "");
 
             string[] NewUser = new string[] { Username, Password, "0", "0", "0" }; //New user to write
@@ -167,6 +172,27 @@ namespace NotAnEscapeRoom
 
             Console.WriteLine("New user successfully created!");
             Console.WriteLine("\nPress any key to write to file.");
+
+            } while(Username == "" && Password == "");
+
+            string[] NewUser = new string[] { Username, Password, "0", "0", "0" }; //New user to write
+            string[,] NewUserData = new string[NumOfUsers + 1, NumOfDataPoints]; //Creates the new array with one extra user
+
+            for(int i = 0; i<NumOfUsers; i++)
+            {
+                for(int j = 0; j<NumOfDataPoints; j++)
+                {
+                    UserData[i, j] = NewUserData[i, j];
+                    Console.WriteLine("yayayayayayay");
+                }
+            }
+
+            for(int i = NumOfUsers; i<NumOfUsers + 1; i++)//LOOK AT THIS LATER
+            {
+
+            }
+
+
             Console.ReadKey();
             SaveToFile(NewUserData);
         }
