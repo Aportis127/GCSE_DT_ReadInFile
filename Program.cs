@@ -20,18 +20,20 @@ namespace NotAnEscapeRoom
 
         static void Main(string[] args)
         {
-            SetUpFile();
+            if (File.Exists(Path) == false)
+            {
+                SetUpFile();
+            }
+            ReadIn();
         }
 
         static void SetUpFile()
         {
-            if (File.Exists(Path) == false)
-            {
-                File.Create(Path);
-                Console.WriteLine("File successfully created!");
-                Console.WriteLine("\nPress any key to continue.");
-                Console.ReadKey();
-            }
+            File.WriteAllText(Path, "");
+            Console.WriteLine("File successfully created!");
+            Console.WriteLine("\nPress any key to continue.");
+            Console.ReadKey();
+
             ReadIn();
         }
 
@@ -41,6 +43,7 @@ namespace NotAnEscapeRoom
             Console.Clear();
 
             //Finding out how many users are in the program
+
             NumOfUsers = File.ReadAllLines(Path).Length;
             UserData = new string[NumOfUsers, NumOfDataPoints];
 
@@ -128,7 +131,8 @@ namespace NotAnEscapeRoom
         static void AddUser()
         {
             string Username = "", Password = "";
-
+            do
+            {    
                 Console.Clear();
                 Banner("Add User");
 
@@ -145,7 +149,7 @@ namespace NotAnEscapeRoom
             NumOfUsers += 1;
             string[,] NewUserData = new string[NumOfUsers, NumOfDataPoints]; //Creates the new array with one extra user
 
-            for (int i = 0; i < NumOfUsers-1; i++)//Adds all but new user to array
+            for (int i = 0; i < NumOfUsers - 1; i++)//Adds all but new user to array
             {
                 for (int j = 0; j < NumOfDataPoints; j++)
                 {
@@ -153,14 +157,14 @@ namespace NotAnEscapeRoom
                 }
             }
 
-            for (int i = NumOfUsers-1; i < NumOfUsers; i++)//adds just the new user
+            for (int i = NumOfUsers - 1; i < NumOfUsers; i++)//adds just the new user
             {
                 for (int j = 0; j < NumOfDataPoints; j++)
                 {
                     NewUserData[i, j] = NewUser[j];
-                }                
+                }
             }
-            
+
             /*for(int i = 0; i<NumOfUsers + 1; i++)
             {
                 for(int j=0; j<NumOfDataPoints; j++)
@@ -172,26 +176,6 @@ namespace NotAnEscapeRoom
 
             Console.WriteLine("New user successfully created!");
             Console.WriteLine("\nPress any key to write to file.");
-
-            } while(Username == "" && Password == "");
-
-            string[] NewUser = new string[] { Username, Password, "0", "0", "0" }; //New user to write
-            string[,] NewUserData = new string[NumOfUsers + 1, NumOfDataPoints]; //Creates the new array with one extra user
-
-            for(int i = 0; i<NumOfUsers; i++)
-            {
-                for(int j = 0; j<NumOfDataPoints; j++)
-                {
-                    UserData[i, j] = NewUserData[i, j];
-                    Console.WriteLine("yayayayayayay");
-                }
-            }
-
-            for(int i = NumOfUsers; i<NumOfUsers + 1; i++)//LOOK AT THIS LATER
-            {
-
-            }
-
 
             Console.ReadKey();
             SaveToFile(NewUserData);
@@ -221,20 +205,20 @@ namespace NotAnEscapeRoom
             File.WriteAllText(Path, "");//Clears file
             string TempUser;
 
-            for (int i = 0; i<NumOfUsers; i++)
+            for (int i = 0; i < NumOfUsers; i++)
             {
-                for(int j = 0; j < NumOfDataPoints; j++)
+                for (int j = 0; j < NumOfDataPoints; j++)
                 {
                     TempUser = UserData[i, j] + ",";
                     File.AppendAllText(Path, TempUser);
                 }
-                File.AppendAllText(Path,"\n");
+                File.AppendAllText(Path, "\n");
             }
 
             Console.WriteLine("File saved successfully!");
             Console.WriteLine("\nPress any key to read-in file.");
             Console.ReadKey();
-            ReadIn();            
+            ReadIn();
         }
     }
 }
