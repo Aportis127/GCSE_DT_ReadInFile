@@ -13,10 +13,10 @@ namespace NotAnEscapeRoom
     class Program
     {
         static string Path = "Users.csv";
-        static int NumOfDataPoints = 5;
+        static int NumOfDataPoints = 3;
         static int NumOfUsers;
         static string[,] UserData;
-
+        static string CurrentUser;
 
         static void Main(string[] args)
         {
@@ -76,7 +76,25 @@ namespace NotAnEscapeRoom
             */
             //This is a test to see if the File is loading everything in correctly
             Console.ReadKey();
-            MainMenu();
+            LogInMenu();
+        }
+
+        static void LogInMenu()
+        {
+            Banner("Log-In Menu");
+            Console.WriteLine("Enter an option:");
+            Console.WriteLine("\n1. Log-In\n2. Add user");
+            string Option = Console.ReadLine();
+
+            switch (Option)
+            {
+                case "1":
+                    LogIn();
+                    break;
+                case "2":
+                //FINISH
+            }
+
         }
 
         static void MainMenu()
@@ -145,7 +163,7 @@ namespace NotAnEscapeRoom
 
             } while (Username == "" && Password == "");
 
-            string[] NewUser = new string[] { Username, Password, "0", "0", "0" }; //New user to write
+            string[] NewUser = new string[] { Username, Password, "0"}; //New user to write
             NumOfUsers += 1;
             string[,] NewUserData = new string[NumOfUsers, NumOfDataPoints]; //Creates the new array with one extra user
 
@@ -185,7 +203,11 @@ namespace NotAnEscapeRoom
         {
             Console.Clear();
             Banner("Quiz");
-            Console.WriteLine("(Quiz)");
+            
+            
+
+
+
             Console.ReadKey();
             MainMenu();
         }
