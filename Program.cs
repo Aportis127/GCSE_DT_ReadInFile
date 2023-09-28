@@ -17,6 +17,7 @@ namespace NotAnEscapeRoom
         static int NumOfUsers;
         static string[,] UserData;
         static string CurrentUser;
+        static bool LoggedIn;
 
         static void Main(string[] args)
         {
@@ -81,20 +82,61 @@ namespace NotAnEscapeRoom
 
         static void LogInMenu()
         {
-            Banner("Log-In Menu");
-            Console.WriteLine("Enter an option:");
-            Console.WriteLine("\n1. Log-In\n2. Add user");
-            string Option = Console.ReadLine();
-
-            switch (Option)
+            while (true)
             {
-                case "1":
-                    LogIn();
-                    break;
-                case "2":
-                //FINISH
-            }
+                Console.Clear();
+                Banner("Log-In Menu");
+                Console.WriteLine("Enter an option:");
+                Console.WriteLine("\n1. Log-In\n2. Add user");
+                string Option = Console.ReadLine();
 
+                switch (Option)
+                {
+                    case "1":
+                        LogIn();
+                        break;
+                    case "2":
+                        AddUser();
+                        break;
+                    default:
+                        Console.WriteLine("\nEnter a valid option.");
+                        Console.ReadKey();
+                        LogInMenu();
+                        break;
+                }
+            }
+        }
+
+        static void LogIn()
+        {
+            for (int Attempts = 0; Attempts < 3; Attempts++)
+            {
+                string UsernameAttempt = "", PasswordAttempt = "";
+
+                Console.Clear();
+                Banner("Log-In");
+                Console.WriteLine("Attempts: " + Attempts);
+                Console.WriteLine("Enter your username: ");
+                UsernameAttempt = Console.ReadLine();
+                Console.WriteLine("Enter your password: ");
+                PasswordAttempt = Console.ReadLine();
+
+                for (int j = 0; j < NumOfUsers; j++)
+                {
+                    if (UserData[j, 0] == UsernameAttempt && UserData[j,1] == PasswordAttempt)
+                    {
+                        CurrentUser = UsernameAttempt;
+                        LoggedIn = true;
+                        Console.WriteLine("You have successfully logged into " + CurrentUser);
+                        Console.ReadKey();
+                        MainMenu();
+                    }
+                }
+            }
+            Console.Clear();
+            Console.WriteLine("You have ran out of password attempts, please re-enter the screen to try again.");
+            Console.ReadKey();
+            LogInMenu();
         }
 
         static void MainMenu()
@@ -106,7 +148,7 @@ namespace NotAnEscapeRoom
                 Console.WriteLine("1. Add User");
                 Console.WriteLine("2. Quiz");
                 Console.WriteLine("3. Stats");
-                Console.WriteLine("0. Quit");
+                Console.WriteLine("0. Log Out");
                 Console.WriteLine("\nSelect an option.");
 
                 Option = Console.ReadLine();
@@ -126,7 +168,11 @@ namespace NotAnEscapeRoom
                         break;
 
                     case "0":
-                        Environment.Exit(1);
+                        CurrentUser = "";
+                        LoggedIn = false;
+                        Console.WriteLine("You have successfully logged out");
+                        Console.ReadKey();
+                        LogInMenu();
                         break;
 
                     default:
@@ -143,6 +189,10 @@ namespace NotAnEscapeRoom
             Console.Clear();
             Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
             Console.WriteLine("Welcome to NOT An Esacpe Room: " + Location);
+            if (LoggedIn == true)
+            {
+                Console.WriteLine("You are currently logged in as " + CurrentUser);
+            }
             Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
         }
 
@@ -150,7 +200,7 @@ namespace NotAnEscapeRoom
         {
             string Username = "", Password = "";
             do
-            {    
+            {
                 Console.Clear();
                 Banner("Add User");
 
@@ -163,7 +213,7 @@ namespace NotAnEscapeRoom
 
             } while (Username == "" && Password == "");
 
-            string[] NewUser = new string[] { Username, Password, "0"}; //New user to write
+            string[] NewUser = new string[] { Username, Password, "0" }; //New user to write
             NumOfUsers += 1;
             string[,] NewUserData = new string[NumOfUsers, NumOfDataPoints]; //Creates the new array with one extra user
 
@@ -203,8 +253,8 @@ namespace NotAnEscapeRoom
         {
             Console.Clear();
             Banner("Quiz");
-            
-            
+
+
 
 
 
