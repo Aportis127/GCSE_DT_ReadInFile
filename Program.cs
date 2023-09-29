@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Timers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,6 +19,14 @@ namespace NotAnEscapeRoom
         static string[,] UserData;
         static string CurrentUser;
         static bool LoggedIn;
+
+        static System.Timers.Timer timer = new System.Timers.Timer(1000);
+        static int CountDown = 11; // Seconds
+        static char[] TypedCharacters = new char[100];
+        static int CharacterCount;
+        static bool AnsweredPrompt = false;
+        static ConsoleKeyInfo CurrentKey;
+        static int QuestionLineNum = 6;
 
         static void Main(string[] args)
         {
@@ -87,7 +96,7 @@ namespace NotAnEscapeRoom
                 Console.Clear();
                 Banner("Log-In Menu");
                 Console.WriteLine("Enter an option:");
-                Console.WriteLine("\n1. Log-In\n2. Add user");
+                Console.WriteLine("\n1. Log-In\n2. Sign up");
                 string Option = Console.ReadLine();
 
                 switch (Option)
@@ -100,6 +109,7 @@ namespace NotAnEscapeRoom
                         break;
                     default:
                         Console.WriteLine("\nEnter a valid option.");
+                        Console.WriteLine("\nPress any key to continue.");
                         Console.ReadKey();
                         LogInMenu();
                         break;
@@ -109,7 +119,7 @@ namespace NotAnEscapeRoom
 
         static void LogIn()
         {
-            for (int Attempts = 0; Attempts < 3; Attempts++)
+            for (int Attempts = 3; Attempts >= 0; Attempts--)
             {
                 string UsernameAttempt = "", PasswordAttempt = "";
 
@@ -123,7 +133,7 @@ namespace NotAnEscapeRoom
 
                 for (int j = 0; j < NumOfUsers; j++)
                 {
-                    if (UserData[j, 0] == UsernameAttempt && UserData[j,1] == PasswordAttempt)
+                    if (UserData[j, 0] == UsernameAttempt && UserData[j, 1] == PasswordAttempt)
                     {
                         CurrentUser = UsernameAttempt;
                         LoggedIn = true;
@@ -132,9 +142,13 @@ namespace NotAnEscapeRoom
                         MainMenu();
                     }
                 }
+                Console.WriteLine("\nIncorrect username or password. Please try again.");
+                Console.WriteLine("\nPress any key to continue.");
+                Console.ReadKey();
             }
             Console.Clear();
             Console.WriteLine("You have ran out of password attempts, please re-enter the screen to try again.");
+            Console.WriteLine("\nPress any key to continue.");
             Console.ReadKey();
             LogInMenu();
         }
@@ -145,9 +159,9 @@ namespace NotAnEscapeRoom
             {
                 Banner("Main Menu");
                 string Option = "0";
-                Console.WriteLine("1. Add User");
-                Console.WriteLine("2. Quiz");
-                Console.WriteLine("3. Stats");
+                
+                Console.WriteLine("1. Quiz");
+                Console.WriteLine("2. Stats");
                 Console.WriteLine("0. Log Out");
                 Console.WriteLine("\nSelect an option.");
 
@@ -156,14 +170,10 @@ namespace NotAnEscapeRoom
                 switch (Option)
                 {
                     case "1":
-                        AddUser();
-                        break;
-
-                    case "2":
                         Quiz();
                         break;
 
-                    case "3":
+                    case "2":
                         Stats();
                         break;
 
@@ -176,7 +186,7 @@ namespace NotAnEscapeRoom
                         break;
 
                     default:
-                        Console.WriteLine("Invalid option. Please enter: 1, 2, 3 or 0");
+                        Console.WriteLine("Invalid option. Please enter: 1, 2 or 0");
                         Console.WriteLine("\nPress any key to continue.");
                         Console.ReadKey();
                         break;
@@ -252,15 +262,157 @@ namespace NotAnEscapeRoom
         static void Quiz()
         {
             Console.Clear();
+
+            StartTimer();
+            Console.Clear();
             Banner("Quiz");
+            Console.WriteLine("What is the largest country by land mass?");
 
+            while (!AnsweredPrompt)
+            {
+                CurrentKey = Console.ReadKey(true);
 
+                switch (CurrentKey.Key)
+                {
+                    case (ConsoleKey.Enter):
+                        CountDown = 0;
+                        break;
+                    case (ConsoleKey.Escape):
+                        Environment.Exit(0);
+                        break;
+                    case (ConsoleKey.Delete):
+                        DeleteChar();
+                        break;
+                    case (ConsoleKey.Backspace):
+                        DeleteChar();
+                        break;
+                    default:
+                        AddChar();
+                        break;
 
+                }
 
+            }
 
-            Console.ReadKey();
-            MainMenu();
+                Console.ReadKey();
+                MainMenu();
         }
+
+        static void RedrawAnswer()
+        {
+            Console.SetCursorPosition(0, QuestionLineNum + 1);
+            Console.Write("\n");
+            Console.SetCursorPosition(0, QuestionLineNum + 1);
+            for (int i = 0; i < TypedCharacters.Length; i++)
+            {
+                if (TypedCharacters[i].Equals(""))
+                {
+                    return;
+                }
+                Console.Write(TypedCharacters[i]);
+            }
+            Console.SetCursorPosition(CharacterCount, QuestionLineNum + 1);
+        }
+        static void AddChar()
+        {
+            if (CharacterCount < TypedCharacters.Length)
+            {
+                TypedCharacters[CharacterCount] = CurrentKey.KeyChar;
+                CharacterCount++;
+                TypeNewChar();
+            }
+        }
+        static void DeleteChar()
+        {
+
+            if (CharacterCount >= 1 && CharacterCount < TypedCharacters.Length)
+            {
+                // Create a new array with the size one less than the original array
+                char[] newArray = new char[TypedCharacters.Length - 1];
+
+                // Copy elements before the index
+                for (int i = 0; i < CharacterCount - 1; i++)
+                {
+                    newArray[i] = TypedCharacters[i];
+                }
+
+                // Copy elements after the index
+                for (int i = CharacterCount - 1; i < newArray.Length; i++)
+                {
+                    newArray[i] = TypedCharacters[i + 1];
+                }
+
+                // Update the original array with the new array
+                TypedCharacters = newArray;
+                CharacterCount--;
+                RedrawAnswer();
+            }
+        }
+        static void TypeNewChar()
+        {
+            Console.SetCursorPosition(0, QuestionLineNum + 1);
+            for (int i = 0; i < CharacterCount; i++)
+            {
+                Console.Write(TypedCharacters[i]);
+            }
+        }
+        static void StartTimer()
+        {
+            timer.Elapsed += UpdateTimer;
+            timer.Enabled = true;
+        }
+
+        static void UpdateTimer(object source, ElapsedEventArgs e)
+        {
+            if (AnsweredPrompt) return;
+            if (CountDown-- <= 0)
+            {
+                // Put code for running out of time here
+                CheckAnswer();
+                return;
+
+
+            }
+            Console.SetCursorPosition(0, QuestionLineNum);
+            Console.WriteLine(CountDown + " Seconds Left! ");
+            Console.SetCursorPosition(CharacterCount, QuestionLineNum+1);
+        }
+        static void CheckAnswer()
+        {
+            string FinalAnswer = "";
+
+            for (int i = 0; i < CharacterCount; i++)
+            {
+                FinalAnswer = FinalAnswer + TypedCharacters[i];
+            }
+            FinalAnswer = FinalAnswer.ToLower();
+
+            Console.Clear();
+            if (FinalAnswer == "russia")
+            {
+                Console.WriteLine("Well done! You got the correct answer.");
+                Console.ReadKey();
+                MainMenu();
+            }
+            else
+            {
+                if (FinalAnswer == "")
+                {
+                    Console.WriteLine("Too bad. The correct answer was Russia.");
+                    Console.ReadKey();
+                    MainMenu();
+                }
+                else
+                {
+                    Console.WriteLine("Too bad. The correct answer was Russia, and you answered" + FinalAnswer);
+                    Console.ReadKey();
+                    MainMenu();
+                }
+
+            }
+
+        }
+
 
         static void Stats()
         {
